@@ -1,0 +1,562 @@
+<!--
+App: VoiceChatGPT - Khuluma
+Created by: vbookshelf
+Github: https://github.com/vbookshelf
+Website: https://woza.work/
+Version 1.1
+Date: 15-May-2023
+License: MIT License
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+	
+	<meta charset="utf-8">
+	<title>Khuluma Voicebot</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="A voice chatbot powered by ChatGPT.">
+		
+		
+	<!--CSS Stylesheets-->
+	<link rel="stylesheet" href="css/w3.css">
+	
+	<link rel="shortcut icon" type="image/png" href="assets/parrot.png">
+	
+	
+    <style>
+      body {
+        background-color: #f9f9f9;
+		font-family: Arial, sans-serif;
+		font-size: 18px;
+		color: #36454F;
+      }
+	   main {
+	   	margin-bottom: 200px;
+	   	color: #36454F;
+        padding: 10px;
+	}
+	
+	.responsive {
+		 width: 100%; /*Makes media scalable as the viewport size changes*/
+		 height: auto;
+		 max-width: 150px;
+		 
+		 } 
+      .container {
+        width: 100%;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+	  
+      .sticky-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background-color: #36454F; /* Charcoal */
+        color: #fff;
+        padding: 10px; /*30px*/
+        text-align: center;
+      }
+      .sticky-bar input[type="text"] {
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        margin-right: 10px;
+        width: 60%;
+        font-size: 18px;
+      }
+      .sticky-bar input[type="submit"] {
+        background-color: #fff;
+        color: #333;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 10px;
+      }
+	  .message-container {
+        margin-bottom: 10px;
+        padding: 5px 20px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+		line-height: 1.8;
+		letter-spacing: 0.02em;
+	}
+	.set-color1 {
+		color: red;
+	}
+	.set-color2 {
+		color: purple;
+	}
+	
+	
+	#chat-buttons {
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  margin-top: 10px;
+	}
+	
+	#chat-buttons button {
+	  margin-right: 20px;
+	  padding: 0px 20px;
+	  border-radius: 5px;
+	  cursor: pointer;
+	  font-size: 15px;
+	  background-color: #36454F;
+	  color: #f9f9f9;
+	  border: none;
+	}
+	
+	#chat-buttons input[type="file"] {
+	  display: none;
+	}
+	
+	#chat-buttons label {
+	  display: inline-block;
+	  padding: 0px 20px;
+	  border-radius: 5px;
+	  cursor: pointer;
+	  font-size: 15px;
+	  background-color: #36454F;
+	  color: #f9f9f9;
+	  border: none;
+	}
+		
+	#chat-buttons input[type="file"] + label {
+	  margin-right: 10px;
+	}
+	
+	#chat-buttons input[type="file"] + label:before {
+	  content: "Load a saved chat";
+	}
+	
+	.sticky-image {
+			position: fixed;
+			top: 0;
+			/*left: 0; Positions image on the left*/
+			right: 0;
+		}
+		
+	.hide {
+		display: none;
+	}
+
+	
+	</style>
+
+	
+  </head>
+  <body>
+	  
+	  
+	  
+	  
+    <div class="container w3-animate-opacity">
+		
+		<!-- Front page image -->
+<!-- This image will be replaced once the js code runs. -->
+<div class="w3-padding-bottom w3-center unblock">
+	
+	<div class="sticky-image">
+	
+		<div class="w3-margin-right w3-margin-left">
+	
+			<img id="selected-image" class="w3-round adjust-image unblock" src="bground.jpg"  height="200" alt="Image for analysis"> 
+		
+		</div>
+		
+		
+		
+		<!-- Button -->
+		<div id="btnn" class="w3-center w3-margin-top">
+			
+			
+			<button class="w3-btn w3-purple w3-hover-blue w3-round w3-margin-bottom adjust-spacing btn-font w3-padding w3-space-letters w3-text-white" onclick="setTimeout(simulateClick.bind(null, 'image-selector'), 200)"><i class='fas fa-camera w3-padding-right' style='font-size:15px'></i>
+				<b>Submit Image</b></button>
+				
+		</div>
+	
+	</div>
+	
+</div>
+		
+	
+	  
+	  <main id="chat" class="texts">
+	      <div class="message-container">
+			  <span id="first-chat-block" class="set-color1"><b>&#x2022 ChatGPT</b></span>
+	        
+			 <p>Hi there, I'm Khuluma, your personal chat companion.<br>
+				 I respond using both text and voice. Please ensure that your sound is not muted.</p>
+			 <p>To have a voice conversation, first click "Start Talking", then allow access to your mic and then... just say hello.</p>
+	        
+	      </div>
+		  
+	      <!-- Add more message containers here -->
+		  
+		   <!-- The div for the spinner gets
+		  added and deleted here. -->
+ 	 </main>
+	 
+	 
+	 
+	 
+	 
+	 
+      <div class="sticky-bar">
+		  
+		<form id="myForm" method="post">
+          <input id="user-input" type="text" name="my_message" placeholder="Send a message..." autofocus>
+		  <input type="hidden" name="robotblock">
+		  
+		  
+		  <input type="submit" value="Send">
+	  		
+	  	</form>
+		
+		
+		<div id="chat-buttons">
+		  <button onclick="saveChatHistoryToCsv()">Save this chat</button>
+		  <input type="file" id="csv-file" accept=".csv">
+		  <label for="csv-file"></label>
+		  
+		  <button onclick="start_recog(makeApiRequest)">Start Talking</button>
+		</div>
+		
+      </div>
+	 
+    </div>
+	
+	
+	<!--The page gets scrolled up to this id.-->
+	<div id="chatgpt">
+	</div>
+	
+	<!--Onload a click is simulated on this to scroll the page to id="bottom-bar"-->
+	<a href="#chatgpt" id="scroll-page-up"></a>
+	<a href="#test100" id="scroll-to-last-message"></a>
+	
+	<div class="hide">
+		<input id="image-selector" type="file">
+	</div>
+
+  </body>
+</html>
+
+<!-- Load jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+</script>
+
+
+
+
+<script>
+  
+//Simulates a click.
+function simulateClick(tabID) {
+	
+	// Simulate a click.
+	document.getElementById(tabID).click();
+	
+}
+
+</script>
+
+
+<!-- Import the utils.js file -->
+<script src="utils.js"></script>
+
+
+<!-- Import the chatgpt config and api function -->
+<script src="chatgpt-config.js"></script>
+
+
+
+<script>
+	// Set the name of the bot in the first chat block
+	document.getElementById("first-chat-block").innerHTML = "<b>&#x2022 " + bot_name + "</b>";
+</script>
+
+
+<script>
+	
+	
+function simulateClick(tabID) {
+	
+	document.getElementById(tabID).click();
+}
+	
+	let dataURL;
+	
+    $("#image-selector").change(function() {
+		
+		console.log('testing...')
+		
+		
+		
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            dataURL = reader.result;
+			
+			console.log(dataURL);
+			
+			// Display the image the user has submitted on the web page.
+			// Do this by changing the src attribute of the elemnt with
+			// the following id: #selected-image
+            $('#selected-image').attr("src", dataURL);
+			
+            //console.log(base64Image);
+        }
+		
+		console.log('hello');
+		
+		// Read the image
+        reader.readAsDataURL($("#image-selector")[0].files[0]);
+		
+		// Get the image file name
+		fname = $("#image-selector")[0].files[0].name;
+		
+		//console.log(fname);	
+        
+    });
+	
+	
+	
+
+
+// Get the form
+var form = document.getElementById('myForm');
+
+form.onsubmit = function(event) {
+	
+	  // Prevent the default form submission behavior
+	  event.preventDefault();
+	  
+	  // Get the form data
+	  var formData = new FormData(form);
+	 
+	  
+	  // Clear the form input
+	  form.reset();
+	  
+	  // Get the value of my_message
+	  var my_message = formData.get("my_message");
+	  
+	  
+	  // Format the input into paragraphs. This
+	  // adds paragrah html to the user's chat.
+	  // It's main use is where the bot's long response needs 
+	  // to be formatted into separate paragraphs.
+	  my_message = formatResponse(my_message);
+	  
+	  console.log(my_message)
+	
+	  
+	  var input_message = {
+	  sender: user_name,
+	  text: my_message
+		};
+	
+	
+	// Add a user message to the chat
+	addMessageToChat(input_message);
+	
+	
+	// Scroll the page up by cicking on a div at the bottom of the page.
+	simulateClick('scroll-page-up');
+	
+	console.log('test1');
+	console.log(dataURL);
+	
+	
+	// Make an API call and process the response.
+	// Refer to: chatgpt-config.js
+	makeApiRequest(my_message, dataURL);
+	
+ 
+};	
+
+
+
+	
+function speak(text) { 
+	
+
+	// Create a new instance of SpeechSynthesisUtterance
+	const utterance = new SpeechSynthesisUtterance();
+	
+	// Set the text that you want to speak
+	utterance.text = text;
+	
+	  
+	  // If speech recognition has been initialized.
+	  // If the user just types then speech recognition 
+	  // is not initialized and the recognition object does not exist.
+	  if (window.recognition) {
+		  
+		  console.log('Stopping recognition...')
+	  
+		  // Pause (delete) the event listener.
+		  // The handleEnd function identifies which event listener we want.
+		  window.recognition.removeEventListener('end', handleEnd);
+		  
+		  // The recognition object has been attached to the window
+		  // in order to make it available globally.
+		  window.recognition.stop();
+	  
+  		}
+
+	
+		// Speak the text
+		speechSynthesis.speak(utterance);
+		
+		
+		// Only when the speech synthesis ends, start the mic.
+		// If we don't use this then the event listener 
+		// will start listening while the bot is still talking.
+		// The bot will then hear it's own voice and respond to it.
+		
+		utterance.onend = function() {
+		
+			if (window.recognition) {
+				
+				console.log('Restarting recognition...')
+			  
+				// Add the event listener again.
+				// The handleEnd function identifies which event listener we want.
+				window.recognition.addEventListener('end', handleEnd);
+				
+				window.recognition.start();
+	  		}
+		};
+	
+	}
+	
+</script>
+
+
+
+
+
+<script>
+	
+
+// Event listener function
+// When the end event is detected, the vent listener
+// uses this function to restart the mic.
+// In this way the mic always stays on.
+// Adding and deleting the event listener is important to
+// ensure that the mic stays on, but that it's also off
+// when the bot is talking.
+function handleEnd () {
+	
+  console.log('Event listener restarting mic...');
+  window.recognition.start();
+	  
+  }
+	
+
+function initialize_recognition() {
+	
+	window.SpeechRecognition =
+	window.SpeechRecognition || window.webkitSpeechRecognition;
+	
+	const recognition = new SpeechRecognition();
+	
+	recognition.continuous = true;
+	
+	// *** Comment out this line for better performance on Android. ***
+	// When this line is commented out there's no intermediate voice detections,
+	// however, the bot works much better on Android.
+	recognition.interimResults = true;
+	
+	// Make the recognition object available globally
+	window.recognition = recognition;
+	
+	
+	console.log('recognition initialized')
+	
+	
+	// Add event listener
+	window.recognition.addEventListener('end', handleEnd);
+	
+	// Pause (Remove) the event listener
+	//window.recognition.removeEventListener('end', handleEnd);
+	
+	
+	window.recognition.start();
+
+}
+
+
+
+
+// Source: Speech Recognition App Using Vanilla JavaScript
+// https://www.youtube.com/watch?v=-k-PgvbktX4
+
+function start_recog(makeApiRequest) {
+	
+	initialize_recognition();
+
+	const texts = document.querySelector(".texts");
+	
+	//window.SpeechRecognition =
+	  //window.SpeechRecognition || window.webkitSpeechRecognition;
+	
+	
+	//window.recognition = recognition;
+	
+	let p = document.createElement("p");
+	
+	
+	recognition.addEventListener("result", (e) => {
+		
+	  texts.appendChild(p);
+	  
+	  let text = Array.from(e.results)
+	    .map((result) => result[0])
+	    .map((result) => result.transcript)
+	    .join("");
+	
+	  p.innerText = text;
+	  
+	  if (e.results[0].isFinal) {
+	
+	    	p = document.createElement("p");
+	  
+		  // Format the input into paragraphs. This
+		  // adds paragrah html to the user's chat.
+		  // It's main use is where the bot's long response needs 
+		  // to be formatted into separate paragraphs.
+		  text = formatResponse(text);
+			
+			
+		  // Make an API call and speak the response.
+		// Refer to: chatgpt-config.js
+		makeApiRequest(text);
+			
+	  }
+	  
+	});
+	
+	
+	//recognition.addEventListener("end", () => {
+	  //recognition.start();
+	//});
+	
+
+	//makeApiRequest(text);
+	//recognition.start();
+}
+
+
+</script>
+
+
+
