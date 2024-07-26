@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concurrent Tasks with Form Input</title>
+</head>
+<body>
+    <h1>Concurrent Tasks Example</h1>
+    <div>
+        <h2>Number Printer</h2>
+        <div id="numberOutput">Number: 0</div>
+    </div>
+    <div>
+        <h2>User Input Form</h2>
+        <form id="userForm">
+            <input type="text" id="userInput" placeholder="Enter some text (or 'exit' to stop)" required>
+            <button type="submit">Submit</button>
+        </form>
+        <div id="inputOutput"></div>
+    </div>
+    <script>
+        let stopThreads = false;
+
+        // Function to print numbers
+        function numberPrinter() {
+            let count = 0;
+            const numberOutput = document.getElementById('numberOutput');
+            
+            function updateNumber() {
+                if (!stopThreads) {
+                    numberOutput.textContent = `Number: ${count}`;
+                    count++;
+                    setTimeout(updateNumber, 1000); // Pause for 1 second
+                } else {
+                    console.log('Number printer stopped.');
+                }
+            }
+
+            updateNumber();
+        }
+
+        // Function to capture user input from the form
+        function userInput() {
+            const userForm = document.getElementById('userForm');
+            const userInputField = document.getElementById('userInput');
+            const inputOutput = document.getElementById('inputOutput');
+
+            userForm.addEventListener('submit', (event) => {
+                event.preventDefault(); // Prevent form submission from reloading the page
+                const userText = userInputField.value;
+                
+                if (userText.toLowerCase() === 'exit') {
+                    stopThreads = true;
+                    inputOutput.textContent = 'Program has ended.';
+                    console.log('Program has ended.');
+                } else {
+                    inputOutput.textContent = `You entered: ${userText}`;
+                    console.log(`You entered: ${userText}`);
+                }
+
+                userInputField.value = ''; // Clear the input field
+            });
+        }
+
+        // Start the tasks
+        numberPrinter();
+        userInput();
+    </script>
+</body>
+</html>
+

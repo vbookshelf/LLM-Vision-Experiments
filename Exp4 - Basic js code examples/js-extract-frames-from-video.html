@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extract Frames from Video</title>
+</head>
+<body>
+    <h1>Extract Frames from Video</h1>
+    <input type="file" id="videoUpload" accept="video/*">
+    <video id="video" controls></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <div id="frames"></div>
+
+    <script>
+        const videoUpload = document.getElementById('videoUpload');
+        const videoElement = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const framesContainer = document.getElementById('frames');
+        const sampleRate = 1; // 1 frame per second
+
+        videoUpload.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            const url = URL.createObjectURL(file);
+            videoElement.src = url;
+
+            videoElement.addEventListener('loadedmetadata', () => {
+                canvas.width = videoElement.videoWidth;
+                canvas.height = videoElement.videoHeight;
+                extractFrames();
+            });
+        });
+
+        function extractFrames() {
+            const duration = videoElement.duration;
+            let currentTime = 0;
+
+            function captureFrame() {
+                videoElement.currentTime = currentTime;
+                videoElement.onseeked = () => {
+                    ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+                    const img = document.createElement('img');
+                    img.src = canvas.toDataURL('image/png');
+                    framesContainer.appendChild(img);
+
+                    currentTime += sampleRate;
+                    if (currentTime <= duration) {
+                        captureFrame();
+                    }
+                };
+            }
+
+            captureFrame();
+        }
+    </script>
+</body>
+</html>
