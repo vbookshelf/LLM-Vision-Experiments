@@ -13,3 +13,7 @@ https://github.com/vbookshelf/LLM-Vision-Experiments/tree/main/Exp2%20-%20Simple
 
 - Exp3 - Simple code to use OpenCv to display an image, a video and a webcam feed<br>
 https://github.com/vbookshelf/LLM-Vision-Experiments/tree/main/Exp3%20-%20use%20opencv%20to%20display%20image%20video%20webcam
+
+- Exp4 - Basic js code examples<br>
+(Display webcam feed, get image frames, run concurrent tasks)<br>
+https://github.com/vbookshelf/LLM-Vision-Experiments/blob/main/Exp4%20-%20Basic%20js%20code%20examples/README.md
