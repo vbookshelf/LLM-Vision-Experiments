@@ -8,3 +8,5 @@
   
 ### Notes
 - In the context of LLLM apps - looking at using Javascript instead of OpenCV to handle videos and images. In this way apps can be written without having to use Python.
+- ChatGPT chat:<br>
+https://chatgpt.com/c/8115bd9c-9f81-49fa-866f-b29db47097b8
