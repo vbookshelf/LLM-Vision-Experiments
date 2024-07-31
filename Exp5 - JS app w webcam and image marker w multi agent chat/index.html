@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Webcam Image Marker Multi-Agent Chat Example - JS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Chatbot">
+<!--CSS Stylesheets-->
+<link rel="stylesheet" href="css/w3.css">
+<style>
+  body {
+    background-color: #f9f9f9;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    color: #36454F;
+    display: flex; /* Use Flexbox for layout */
+    margin: 0; /* Reset default margin */
+    height: 100vh; /* Full height of the viewport */
+    overflow: hidden; /* Prevent scrolling on the body */
+  }
+  
+  a {
+        text-decoration: none;
+    }
+	
+  .container {
+    display: flex; /* Use Flexbox for inner layout */
+    flex: 1; /* Take up the full width */
+    max-width: none; /* Override previous max-width */
+    height: 100%; /* Full height */
+  }
+  .left-column, .right-column {
+    flex: 1; /* Split space evenly */
+    overflow-y: auto; /* Enable independent scrolling */
+    height: 100vh; /* Full viewport height */
+  }
+  .left-column {
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+  }
+  
+  .right-column {
+	  background-color: #36454F;
+  }
+  
+  main {
+    flex: 1; /* Allow main content to expand */
+    overflow-y: auto; /* Enable scrolling if needed */
+  }
+  .sticky-bar {
+    background-color: #36454F; /* Charcoal */
+    color: #fff;
+    padding: 10px; /*30px*/
+    text-align: center;
+  }
+  
+  /* Existing CSS for input, button, etc. */
+  
+  .sticky-bar input[type="text"] {
+        padding: 10px;
+        border-radius: 5px;
+        border: none;
+        margin-right: 10px;
+        width: 60%;
+        font-size: 18px;
+      }
+      .sticky-bar input[type="submit"] {
+        background-color: #fff;
+        color: #333;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 10px;
+      }
+	  .message-container {
+        margin-bottom: 10px;
+        padding: 5px 20px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+		line-height: 1.8;
+		letter-spacing: 0.02em;
+	}
+	.set-color1 {
+		color: red;
+	}
+	.set-color2 {
+		color: purple;
+	}
+	
+	
+	#chat-buttons {
+	  display: flex;
+	  justify-content: center;
+	  align-items: center;
+	  margin-top: 10px;
+	}
+	
+	#chat-buttons button {
+	  margin-right: 20px;
+	  padding: 0px 20px;
+	  border-radius: 5px;
+	  cursor: pointer;
+	  font-size: 15px;
+	  background-color: #36454F;
+	  color: #f9f9f9;
+	  border: none;
+	}
+	
+	#chat-buttons input[type="file"] {
+	  display: none;
+	}
+	
+	#chat-buttons label {
+	  display: inline-block;
+	  padding: 0px 20px;
+	  border-radius: 5px;
+	  cursor: pointer;
+	  font-size: 15px;
+	  background-color: #36454F;
+	  color: #f9f9f9;
+	  border: none;
+	}
+	
+	
+	
+	#chat-buttons input[type="file"] + label {
+	  margin-right: 10px;
+	}
+	
+	#chat-buttons input[type="file"] + label:before {
+	  content: "Load a saved chat";
+  }
+  
+  /* Style the buttons that are used to open and close the accordion panel */
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .accordion:hover {
+  /*background-color: #ccc;*/
+}
+
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+  padding: 0 18px;
+  background-color: white;
+  display: none;
+  overflow: hidden;
+}
+
+.accordion:after {
+  /*content: '\02795';  Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  /*content: "\2796";  Unicode character for "minus" sign (-) */
+}
+
+
+</style>
+
+    <style>
+        #videoElement {
+            width: 100%; /*640*/
+            height: 280px; /*480*/
+            background-color: #ccc;
+        }
+        #controlButton, #screenshotButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        #screenshotCanvas {
+            display: none;
+        }
+        #imageCanvas1 {
+            border: 1px solid #ccc;
+            display: block;
+            margin-top: 20px;
+        }
+        #controls {
+            margin-top: 10px;
+        }
+    </style>
+	
+	
+	
+
+</head>
+<body>
+<div class="container w3-animate-opacity">
+	
+
+
+	
+ <!-- LEFT COLUMN -->
+ <div class="right-column w3-padding-large">
+	 
+		<!-- Webcam -->
+    <video id="videoElement" autoplay></video>
+    <br>
+    <button id="controlButton">Start Webcam</button>
+    <button id="screenshotButton" disabled>Webcam Screenshot</button>
+    <canvas id="screenshotCanvas"></canvas>
+	
+	
+    <!-- Image Marker -->
+    <canvas id="imageCanvas1"></canvas>
+	<input type="file" id="imageUpload" accept="image/*">
+    <div id="controls">
+		<select id="drawMode">
+            <option value="box">Draw Box</option>
+            <option value="arrow">Draw Arrow</option>
+        </select>
+        <button id="clearButton">Undo All</button>
+        <button id="undoButton">Undo Last</button>
+		<button id="saveButton">Save Marked Image</button>
+        
+    </div>
+	 
+	 
+	
+</div><!--End of Left Column-->
+
+
+	
+<!-- RIGHT COLUMN -->
+<div class="left-column w3-padding-large w3-border-left">
+    <main id="chat">
+		
+      	<div class="message-container">
+			<!--
+			  <span id="first-chat-block" class="set-color1"><b>&#x2022 ChatGPT</b></span>
+	        -->
+			
+			  <p>Rough example.<br>
+				  Multi-agent chat simulating a panel discussion.<br>
+				  The Webcam and Image Marker are working.<br>
+				  Code is not clean.<br>
+				  Next step is to add capability to send images to the model.<br>
+				  Text input expands to three rows.
+			  </p>
+			
+
+	      </div>
+		  
+		  
+	      <!-- Add more message containers here -->
+    </main>
+    <div class="sticky-bar w3-margin-top">
+		
+	<!--
+      <form id="myForm" method="post">
+          <input id="user-input" type="text" name="my_message" placeholder="Send message..." autofocus>
+		  <input type="hidden" name="robotblock">
+		  
+		  
+		  <input type="submit" value="Send">
+	  		
+	  </form>
+	 -->
+	  
+	 <form id="myForm" method="post" style="display: flex; align-items: center; width: 100%;">
+  <textarea id="user-input" name="my_message" placeholder="Send message..." rows="1" style="flex: 1; resize: none; overflow: auto; box-sizing: border-box;" oninput="adjustHeight(this)" autofocus></textarea>
+  <button type="submit" style="margin-left: 10px;">Send</button>
+  <input type="hidden" name="robotblock">
+</form>
+
+
+
+<script>
+function adjustHeight(textarea) {
+  textarea.style.height = 'auto';
+  const maxRows = 3;
+  const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight);
+  const maxHeight = lineHeight * maxRows;
+  if (textarea.scrollHeight > maxHeight) {
+    textarea.style.height = maxHeight + 'px';
+    textarea.style.overflowY = 'auto'; // Enable vertical scrolling when max height is reached
+  } else {
+    textarea.style.height = textarea.scrollHeight + 'px';
+    textarea.style.overflowY = 'hidden'; // Hide the vertical scrollbar if not needed
+  }
+}
+</script>
+
+
+
+
+    </div>
+	
+	<!--The page gets scrolled up to this id.-->
+	<div id="chatgpt">
+	</div>
+	
+	<!--Onload a click is simulated on this to scroll the page to id="bottom-bar"-->
+	<a href="#chatgpt" id="scroll-page-up"></a>
+	
+ </div><!--End of Right Column-->
+  
+  
+ 
+
+
+	
+</body>
+</html>
+
+
+
+
+
+<script>
+
+//Simulates a click.
+function simulateClick(tabID) {
+	
+	// Simulate a click.
+	document.getElementById(tabID).click();
+	
+	console.log('clicked...')
+	
+}
+
+</script>
+
+
+<!-- Import the utils.js file -->
+<script src="utils.js"></script>
+
+<!-- Import the chatgpt config and api function -->
+<script src="chatgpt-config.js"></script>
+
+<!-- Import the image-tools.js file -->
+<script src="image-tools.js"></script>
+
+
+<script>
+	// Set the name of the bot in the first chat block
+	document.getElementById("first-chat-block").innerHTML = "<b>&#x2022 " + bot_name + "</b>";
+</script>
+
+
+<script>
+
+
+// Get the form
+var form = document.getElementById('myForm');
+
+form.onsubmit = function(event) {
+	
+	  // Prevent the default form submission behavior
+	  event.preventDefault();
+	  
+	  // Get the form data
+	  var formData = new FormData(form);
+	 
+	  
+	  // Clear the form input
+	  form.reset();
+	  
+	  // Get the value of my_message
+	  var my_message = formData.get("my_message");
+	  //console.log($my_message);
+	  
+	  
+	  // Format the input into paragraphs. This
+	  // adds paragrah html to the students chat.
+	  // It's main use is in Maiya's chat where the long response needs 
+	  // to be formatted into separate paragraphs.
+	  my_message = formatResponse(my_message);
+	  
+	  console.log(my_message)
+	
+	  
+	  var input_message = {
+	  sender: user_name,
+	  text: my_message
+		};
+	
+	
+	//console.log(input_message.text);
+	
+	
+	// Add a user message to the chat
+	addMessageToChat(input_message);
+	
+	//scrollToBottom();
+	
+	scrollToLastMessage();
+	
+	
+	// Scroll the page up by cicking on a div at the bottom of the page.
+	//simulateClick('scroll-page-up');
+	
+	
+	// Make an API call and process the response.
+	// Refer to: chatgpt-config.js
+	makeApiRequest(my_message);
+	
+ 
+};	
+  
+
+</script>
+
+
+
